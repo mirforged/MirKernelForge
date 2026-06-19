@@ -1,0 +1,60 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'xin.micro.kp.moduleloader'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "xin.micro.kp.moduleloader"
+        minSdk 29
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    // 如果使用 View 系统，可以移除 compose 支持
+    // 如果仍需要使用 Compose 的 Java 互操作，保留以下配置
+    buildFeatures {
+        // compose true  // 纯 Java + View 系统时注释掉
+        // viewBinding true  // 可选：启用 ViewBinding
+    }
+}
+
+dependencies {
+    // AndroidX 核心库
+    implementation libs.androidx.appcompat.v170
+    implementation libs.material.v1120
+    implementation libs.androidx.constraintlayout
+    implementation libs.androidx.fragment
+    implementation libs.androidx.activity
+
+    implementation libs.androidx.compose.material.icons.extended //icons
+
+    //libsu
+    //noinspection UseTomlInstead
+    implementation "com.github.topjohnwu.libsu:core:6.0.0"
+    //noinspection UseTomlInstead
+    implementation "com.github.topjohnwu.libsu:service:6.0.0"
+
+
+    // 测试依赖
+    // testImplementation 'junit:junit:4.13.2'
+    // androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    // androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+}

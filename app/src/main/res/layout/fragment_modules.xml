@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Modules Fragment"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/txt_temp1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="未获取"
+            android:textSize="24sp" />
+
+        <!-- 底部工具栏 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_temp1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取当前 kpatch 状态" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
