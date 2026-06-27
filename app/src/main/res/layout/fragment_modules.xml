@@ -2,6 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp">
 
 
@@ -16,14 +17,49 @@
             android:layout_height="wrap_content"
             android:text="Modules Fragment"
             android:textSize="24sp" />
+        <androidx.cardview.widget.CardView
+            android:id="@+id/base_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/white">
 
-        <TextView
-            android:id="@+id/txt_temp1"
+            <!-- CardView 的内容 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="标题"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/modules_logs"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="这是卡片内容"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- kpm列表-->
+        <LinearLayout
+            android:id="@+id/modules_card_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="未获取"
-            android:textSize="24sp" />
+            android:orientation="vertical">
+
+        </LinearLayout>
 
         <!-- 底部工具栏 -->
         <LinearLayout
@@ -35,7 +71,26 @@
                 android:id="@+id/btn_temp1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="获取当前 kpatch 状态" />
+                android:text="拉取boot" />
+            <Button
+                android:id="@+id/btn_temp2"
+                android:layout_width="wrap_con
+
+
+
+
+
+
+
+
+                tent"
+                android:layout_height="wrap_content"
+                android:text="获取patch状态" />
+            <Button
+                android:id="@+id/btn_temp3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GUI" />
         </LinearLayout>
     </LinearLayout>
 

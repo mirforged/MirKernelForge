@@ -10,5 +10,9 @@
         android:id="@+id/navigation_modules"
         android:icon="@drawable/ic_modules"
         android:title="Modules" />
+    <item
+        android:id="@+id/navigation_patch"
+        android:icon="@drawable/ic_install"
+        android:title="Patch" />
 
 </menu>

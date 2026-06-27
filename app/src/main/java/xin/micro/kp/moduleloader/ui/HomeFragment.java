@@ -38,10 +38,15 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        Log.d("HomeFragment", "onViewCreated: FUCKCCCCCCCCCCCCCCCCCCCCc");
         initViews(view);
         setupListeners();
         checkRootStatus();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     private void initViews(View view) {

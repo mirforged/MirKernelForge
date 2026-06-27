@@ -90,6 +90,7 @@ public class RootShellUtil {
             result.error = e.getMessage();
         }
 
+        Log.d(TAG, "执行命令: " +command + "\n输出: " + result.output + "\n错误: " + result.error);
         return result;
     }
 
@@ -139,7 +140,6 @@ public class RootShellUtil {
             InputStream inputStream = context.getAssets().open(scriptPath);
             Shell.Result result = Shell.cmd(inputStream).exec();
 
-            Log.i(TAG,"sfSf "+result.getOut());
             return new ShellResult(result.isSuccess(),
                     String.join("\n", result.getOut()),
                     String.join("\n", result.getErr()));
