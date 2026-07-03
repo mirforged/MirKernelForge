@@ -3,11 +3,11 @@ package xin.micro.kp.moduleloader.util;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.webkit.MimeTypeMap;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,20 +24,24 @@ public class FileUtil {
     }
 
     /**
-     * 在Activity的onCreate中调用初始化
+     * 在Activity中初始化
      */
     public void init(AppCompatActivity activity) {
         launcher = activity.registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
+                result -> handleResult(result.getResultCode(), result.getData(), activity)
+        );
+    }
+
+    /**
+     * 在Fragment中初始化
+     */
+    public void init(Fragment fragment) {
+        launcher = fragment.registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        Uri uri = result.getData().getData();
-                        if (uri != null) {
-                            String path = copyToTemp(activity, uri);
-                            if (resultListener != null) {
-                                resultListener.onResult(path);
-                            }
-                        }
+                    if (fragment.getActivity() != null) {
+                        handleResult(result.getResultCode(), result.getData(), fragment.getActivity());
                     }
                 }
         );
@@ -61,9 +65,24 @@ public class FileUtil {
     }
 
     /**
+     * 处理选择结果
+     */
+    private void handleResult(int resultCode, Intent data, Activity activity) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                String path = copyToTemp(activity, uri);
+                if (resultListener != null) {
+                    resultListener.onResult(path);
+                }
+            }
+        }
+    }
+
+    /**
      * 复制到应用临时目录并返回绝对路径
      */
-    private String copyToTemp(AppCompatActivity activity, Uri uri) {
+    private String copyToTemp(Activity activity, Uri uri) {
         try {
             File tempDir = new File(activity.getCacheDir(), "temp");
             if (!tempDir.exists()) tempDir.mkdirs();

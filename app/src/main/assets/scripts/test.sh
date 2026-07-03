@@ -7,7 +7,7 @@ mkdir -p /data/adb/mirkforged
 cd "/data/adb/mirkforged"
 echo curr dir: $(pwd)
 
-./testgetboot.sh #会写为ori_boot.img kernel
+./getboot.sh #会写为ori_boot.img kernel
 cp ./boot_ori.img boot.img
 
 #echo "=== infomations ==="

@@ -9,27 +9,35 @@ import java.io.IOException;
 import xin.micro.kp.moduleloader.root.RootShellUtil;
 
 public class MagicUtil {
-    public static void releaseFile(Context context){
+
+    // /data/adb/mirkforged - Workspace
+    // /app-data-files/ - Workspace2
+    // ws2/kpm/ - kpm which will be add
+
+    /**
+     * 这tm就是一坨史
+     */
+    public static void releaseFile(Context context) {
         // 释放文件
         try {
             File filesDir = context.getFilesDir();
 
-            //testgetboot.sh
-            AssetsUtil.releaseAsset(context, "scripts/testgetboot.sh");
-            File destFile = new File(filesDir, "scripts/testgetboot.sh"); // 注意 释放的时候会保持目录
-            RootShellUtil.execCommand("cp " + destFile.getAbsolutePath() + " /data/adb/mirkforged/");
-            RootShellUtil.execCommand("chmod +x /data/adb/mirkforged/testgetboot.sh");
+            //getboot.sh
+            AssetsUtil.releaseAsset(context, "scripts/getboot.sh");
+            File destFile = new File(filesDir, "scripts/getboot.sh"); // 注意 释放的时候会保持目录
+            RootShellUtil.execCommand("cp -u " + destFile.getAbsolutePath() + " /data/adb/mirkforged/");
+            RootShellUtil.execCommand("chmod +x /data/adb/mirkforged/getboot.sh");
 
             //util_functions.sh
             AssetsUtil.releaseAsset(context, "scripts/util_functions.sh");
             destFile = new File(filesDir, "scripts/util_functions.sh");
-            RootShellUtil.execCommand("cp " + destFile.getAbsolutePath() + " /data/adb/mirkforged/");
+            RootShellUtil.execCommand("cp -u " + destFile.getAbsolutePath() + " /data/adb/mirkforged/");
             RootShellUtil.execCommand("chmod +x /data/adb/mirkforged/util_functions.sh");
 
             //kptools-android
             AssetsUtil.releaseAsset(context, "kptools-android");
             destFile = new File(filesDir, "kptools-android");
-            RootShellUtil.execCommand("cp " + destFile.getAbsolutePath() + " /data/adb/mirkforged/");
+            RootShellUtil.execCommand("cp -u " + destFile.getAbsolutePath() + " /data/adb/mirkforged/");
             RootShellUtil.execCommand("chmod +x /data/adb/mirkforged/kptools-android");
 
             //kpimg
@@ -41,30 +49,55 @@ public class MagicUtil {
         }
     }
 
-    public static record PatchInfo(String raw,String banner,boolean isPatched){
-
+    public static void cleanWorkSpace(){
+        RootShellUtil.execCommand("rm -rf /data/adb/mirkforged/*");
     }
-    public static PatchInfo getPatchInformation(){
+
+    public static record PatchInfo(String raw, String banner, boolean isPatched) {
+    }
+
+    public static PatchInfo getPatchInformation() {
         RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && ./kptools-android --image kernel --list");
 
         Log.d("MagicUtil", "getPatchInformation: " + result.output);
         INIUtil.INIResult ini = INIUtil.parse(result.output);
-        return new PatchInfo(result.output ,
-                ini.get("kernel","banner"),
-                ini.get("kernel","patched").equals("true")
+        return new PatchInfo(result.output,
+                ini.get("kernel", "banner"),
+                ini.get("kernel", "patched").equals("true")
         );
 
     }
-    public static String patchKernel(String[] additionArgs){
+
+    public static String patchKernel(String[] additionArgs) {
         RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && ./kptools-android --image kernel --patch -k kpimg -o kernel");
-        return result.output+"\nError(if so, it will show here):\n"+result.error;
+        return result.output + "\nError(if so, it will show here):\n" + result.error;
     }
-    public static String packBootImg(){
+
+    /**
+     * 会将kernel写入到boot.img
+     */
+    public static String packBootImg() {
         RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && ./kptools repack \"boot.img\"");
-        return result.output+"\nError(if so, it will show here):\n"+result.error;
+        return result.output + "\nError(if so, it will show here):\n" + result.error;
     }
-    public static String installPatchedKernel(){
-        RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && dd if=/data/adb/mirkforged/kernel.img of=/dev/block/by-name/boot");
+
+    /**
+     * 将/data/adb/mirkforged/boot.img写入到当前槽位
+     */
+    public static String installPatchedBoot() {
+        RootShellUtil.ShellResult result = RootShellUtil.execCommand("dd if=/data/adb/mirkforged/boot.img of="+getCurrBootSlotPath());
         return "Please reboot";
     }
+
+
+    public static String getCurrBootSha256() {
+        RootShellUtil.ShellResult result = RootShellUtil.execCommand("sha256sum -b " + getCurrBootSlotPath());
+        return result.output;
+    }
+
+    public static String getCurrBootSlotPath() {
+        RootShellUtil.ShellResult result = RootShellUtil.execCommand("ls /dev/block/by-name/boot$(getprop ro.boot.slot_suffix) 2>/dev/null || echo /dev/block/by-name/boot");
+        return result.output;
+    }
+
 }

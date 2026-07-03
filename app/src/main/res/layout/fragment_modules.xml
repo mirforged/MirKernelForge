@@ -68,29 +68,15 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btn_temp1"
+                android:id="@+id/btn_refresh_boot_full"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="拉取boot" />
             <Button
-                android:id="@+id/btn_temp2"
-                android:layout_width="wrap_con
-
-
-
-
-
-
-
-
-                tent"
-                android:layout_height="wrap_content"
-                android:text="获取patch状态" />
-            <Button
-                android:id="@+id/btn_temp3"
+                android:id="@+id/btn_get_patch_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="GUI" />
+                android:text="获取patch状态" />
         </LinearLayout>
     </LinearLayout>
 

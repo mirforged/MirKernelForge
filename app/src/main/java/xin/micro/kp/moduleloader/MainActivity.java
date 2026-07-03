@@ -10,15 +10,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentContainerView;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import xin.micro.kp.moduleloader.root.RootShellUtil;
 import xin.micro.kp.moduleloader.ui.HomeFragment;
 import xin.micro.kp.moduleloader.ui.ModulesFragment;
 import xin.micro.kp.moduleloader.ui.PatchFragment;
-import xin.micro.kp.moduleloader.util.FileUtil;
-import xin.micro.kp.moduleloader.util.KernelPatch;
+import xin.micro.kp.moduleloader.kp.KernelPatch;
 import xin.micro.kp.moduleloader.util.MagicUtil;
 
 public class MainActivity extends AppCompatActivity {
