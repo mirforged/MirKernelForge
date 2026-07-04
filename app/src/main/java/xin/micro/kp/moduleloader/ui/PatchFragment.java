@@ -1,7 +1,6 @@
 package xin.micro.kp.moduleloader.ui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,20 +11,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import xin.micro.kp.moduleloader.R;
 import xin.micro.kp.moduleloader.kp.KPMItem;
+import xin.micro.kp.moduleloader.util.ConfigUtils;
 import xin.micro.kp.moduleloader.util.FileUtil;
 import xin.micro.kp.moduleloader.kp.KernelPatch;
 import xin.micro.kp.moduleloader.util.MagicUtil;
 
-public class PatchFragment extends Fragment {
+public class PatchFragment extends MyFragment {
 
     private RecyclerView rvModules;
     private Button btnAddModule;
@@ -34,7 +34,7 @@ public class PatchFragment extends Fragment {
     private TextView tvInfoDescription;
     private TextView tvInfoStatus;
     private ModuleAdapter adapter;
-    private FileUtil fileUtil;//用于选择模块
+    private FileUtil fileUtil;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,10 +48,13 @@ public class PatchFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_patch, container, false);
         initViews(view);
-        setupView();
         setupListeners();
-        Log.d("PatchFragment", "onCreateView: ");
         return view;
+    }
+
+    @Override
+    public void onShow() {
+        refreshView();
     }
 
     private void initViews(View view) {
@@ -63,9 +66,7 @@ public class PatchFragment extends Fragment {
         tvInfoStatus = view.findViewById(R.id.tv_info_status);
     }
 
-    private void setupView() {
-
-        // 这里可以动态更新信息卡片的内容
+    private void refreshView() {
         tvInfoTitle.setText("信息");
         if (!KernelPatch.getInstance().isNormal()) {
             tvInfoStatus.setText("无法获取状态");
@@ -74,34 +75,37 @@ public class PatchFragment extends Fragment {
         } else {
             tvInfoStatus.setText("状态: 未修补");
         }
+
         int preAddKpmCount = KernelPatch.getInstance().refreshKpmList(requireContext());
+        List<KPMItem> moduleList = KernelPatch.getInstance().getModuleList();
 
-        //显示将被修补的kpm
-        if (preAddKpmCount > 0) {
-            //遍历dir 获取需要修补的kpm
-            List<KPMItem> moduleList = KernelPatch.getInstance().getModuleList();
-            adapter = new ModuleAdapter(moduleList);
-
-            rvModules.setLayoutManager(new LinearLayoutManager(getContext()));
-            rvModules.setAdapter(adapter);
-            adapter.setOnItemClickListener(position -> {
-                KPMItem item = moduleList.get(position);
-                Toast.makeText(getContext(), "点击了: " + item.name, Toast.LENGTH_SHORT).show();
-            });
+        if (preAddKpmCount > 0 && moduleList != null && !moduleList.isEmpty()) {
+            if (adapter == null) {
+                adapter = new ModuleAdapter(moduleList);
+                rvModules.setLayoutManager(new LinearLayoutManager(getContext()));
+                rvModules.setAdapter(adapter);
+                adapter.setOnItemClickListener(position -> {
+                    KPMItem item = adapter.getItem(position);
+                    if (item != null) {
+                        Toast.makeText(getContext(), "点击了: " + item.name, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                adapter.updateItems(moduleList);
+            }
             tvInfoDescription.setText("跟随修补的kpm数量: " + preAddKpmCount + "个");
         } else {
             tvInfoDescription.setText("你还没有预添加kpm");
+            if (adapter != null) {
+                adapter.clearItems();
+            }
         }
-
     }
 
     private void setupListeners() {
-        //finished
         btnAddModule.setOnClickListener(v -> {
-            // 触发选择文件
-            Toast.makeText(getContext(), "选择文件功能 - 请在此实现文件选择逻辑", Toast.LENGTH_SHORT).show();
             fileUtil.pickFile();
-            this.fileUtil.setListener(path -> {
+            fileUtil.setListener(path -> {
                 if (path != null) {
                     KPMItem kpmItem = new KPMItem(path);
                     kpmItem.complete();
@@ -109,17 +113,15 @@ public class PatchFragment extends Fragment {
                             .setTitle("即将添加：" + kpmItem.name)
                             .setMessage("描述: " + kpmItem.description)
                             .setPositiveButton("确定", (dialog, which) -> {
-                                // 用户点击确定
                                 if (KernelPatch.getInstance().preAddKpm(requireContext(), new File(path))) {
                                     Toast.makeText(getContext(), "添加成功", Toast.LENGTH_SHORT).show();
+                                    refreshView();
                                 } else {
                                     Toast.makeText(getContext(), "添加失败", Toast.LENGTH_SHORT).show();
                                 }
                             })
-                            .setNegativeButton("取消", (dialog, which) -> {
-                                dialog.dismiss();
-                            })
-                            .setCancelable(true) // 点击外部可取消
+                            .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
+                            .setCancelable(true)
                             .show();
                 } else {
                     Toast.makeText(getContext(), "FilePath为Null", Toast.LENGTH_SHORT).show();
@@ -127,39 +129,30 @@ public class PatchFragment extends Fragment {
             });
         });
 
-
         btnStartRepair.setOnClickListener(v -> {
-            String msg = KernelPatch.getInstance().doPatchAndPackBootImg(); //doPatch
-            if (msg.contains("patch done")){
-
+            String msg = KernelPatch.getInstance().doPatchAndPackBootImg();
+            if (msg != null) {
                 new AlertDialog.Builder(requireContext())
                         .setTitle("确认操作")
-                        .setMessage("当前已经修补完成 是否安装()？\n\nPatch Logs: \n" + msg)
+                        .setMessage("当前已经修补完成 是否安装(刷入)？\n\nPatch Logs: \n" + msg)
                         .setPositiveButton("确定", (dialog, which) -> {
-                            // 用户点击确定
-
+                            KernelPatch.getInstance().flashBootSlot();
+                            ConfigUtils.sp.edit().putString("recorded_boot_sha256", MagicUtil.getCurrBootSha256()).apply();
                         })
-                        .setNegativeButton("取消", (dialog, which) -> {
-                            // 用户点击取消
-                            dialog.dismiss();
-                        })
-                        .setCancelable(true) // 点击外部可取消
+                        .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
+                        .setCancelable(true)
                         .show();
-            }else{
+            } else {
                 new AlertDialog.Builder(requireContext())
                         .setTitle("失败")
-                        .setMessage("当前已经修补似乎没有成功\n\nPatch Logs: \n" + msg)
-                        .setPositiveButton("确定(无操作)", (dialog, which) -> {
-
-                            dialog.dismiss();
-                        })
-                        .setCancelable(true) // 点击外部可取消
+                        .setMessage("当前修补似乎没有成功\n\nPatch Logs: \n" + msg)
+                        .setPositiveButton("确定", (dialog, which) -> dialog.dismiss())
+                        .setCancelable(true)
                         .show();
             }
         });
     }
 
-    // RecyclerView适配器（简化版，只处理模块卡片）
     public static class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleViewHolder> {
 
         private List<KPMItem> items;
@@ -170,7 +163,28 @@ public class PatchFragment extends Fragment {
         }
 
         public ModuleAdapter(List<KPMItem> items) {
-            this.items = items;
+            this.items = items != null ? new ArrayList<>(items) : new ArrayList<>();
+        }
+
+        public void updateItems(List<KPMItem> newItems) {
+            if (newItems == null) {
+                this.items = new ArrayList<>();
+            } else {
+                this.items = new ArrayList<>(newItems);
+            }
+            notifyDataSetChanged();
+        }
+
+        public void clearItems() {
+            this.items.clear();
+            notifyDataSetChanged();
+        }
+
+        public KPMItem getItem(int position) {
+            if (position >= 0 && position < items.size()) {
+                return items.get(position);
+            }
+            return null;
         }
 
         public void setOnItemClickListener(OnItemClickListener listener) {

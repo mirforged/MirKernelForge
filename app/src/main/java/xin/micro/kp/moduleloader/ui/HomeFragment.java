@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment;
 import xin.micro.kp.moduleloader.R;
 import xin.micro.kp.moduleloader.root.RootShellUtil;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends MyFragment {
     private TextView rootStatusText;
     private CardView systemInfoCard;
     private TextView deviceModel;
@@ -38,7 +38,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d("HomeFragment", "onViewCreated: FUCKCCCCCCCCCCCCCCCCCCCCc");
         initViews(view);
         setupListeners();
         checkRootStatus();

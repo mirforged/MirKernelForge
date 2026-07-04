@@ -20,9 +20,10 @@ import androidx.fragment.app.Fragment;
 
 import xin.micro.kp.moduleloader.R;
 import xin.micro.kp.moduleloader.kp.KernelPatch;
+import xin.micro.kp.moduleloader.util.ConfigUtils;
 import xin.micro.kp.moduleloader.util.MagicUtil;
 
-public class ModulesFragment extends Fragment {
+public class ModulesFragment extends MyFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -33,17 +34,17 @@ public class ModulesFragment extends Fragment {
     private Button btnRefreshBootFull;
     private Button btnGetPatchStatus;
     private TextView modulesLogs;
-    SharedPreferences sp;
 
     @SuppressLint({"CommitPrefEdits", "SetTextI18n"})
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        sp = requireContext().getSharedPreferences("my_config", MODE_PRIVATE);
+
+        //判断当前是否需要刷新工作区
         String currBootSha = MagicUtil.getCurrBootSha256();
-        String recordedBootSha = sp.getString("recorded_boot_sha256","NULL");
+        String recordedBootSha = ConfigUtils.sp.getString("recorded_boot_sha256","NULL");
         if (recordedBootSha.equals("NULL")){
-            sp.edit().putString("recorded_boot_sha256",MagicUtil.getCurrBootSha256()).apply();
+            ConfigUtils.sp.edit().putString("recorded_boot_sha256",MagicUtil.getCurrBootSha256()).apply();
             KernelPatch.getInstance().refreshStatusFull(requireContext());
             Toast.makeText(requireContext(),"初次使用？ 已自动拉取boot分区",Toast.LENGTH_SHORT).show();
         }
@@ -52,16 +53,27 @@ public class ModulesFragment extends Fragment {
                     .setTitle("工作空间boot.img与实际boot分区不匹配")
                     .setMessage("如果你不清楚你在做什么 请参考 \n如果你在软件外曾更新过boot分区*请重新拉取* \n如果你清楚自己在做什么 可以取消\n\n选择错误将会导致boot回退*")
                     .setPositiveButton("重新拉取", (dialog, which) -> {
-                        // 用户点击确定
-
+                        KernelPatch.getInstance().refreshStatusFull(requireContext());
                     })
                     .setNegativeButton("取消", (dialog, which) -> {
-                        // 用户点击取消
-                        dialog.dismiss();
+                        dialog.dismiss();//useless
                     })
                     .setCancelable(true) // 点击外部可取消
                     .show();
         }
+        if(!KernelPatch.getInstance().doGetPatchInformation()){
+            //还未拉取boot
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("还未拉取boot分区")
+                    .setMessage("是否立刻拉取boot分区？")
+                    .setPositiveButton("立刻拉取（推荐）", (dialog, which) -> {
+                        KernelPatch.getInstance().refreshStatusFull(requireContext());
+                    })
+                    .setNegativeButton("取消", (dialog, which) -> {
+                        dialog.dismiss();//useless
+                    }).show();
+        }
+        //==========================================================================================
 
 
         modulesLogs = view.findViewById(R.id.modules_logs);
@@ -78,7 +90,7 @@ public class ModulesFragment extends Fragment {
             if (info.isPatched()) {
                 modulesLogs.setText("banner: " + info.banner() +
                         "\nisPatched: " + info.isPatched() +
-                        "\n\n" + sp.getString("boot_sha256", "NULL")
+                        "\nrecorded_boot_sha256: " + ConfigUtils.sp.getString("recorded_boot_sha256", "NULL")
 
                 );
                 LinearLayout parentLayout = view.findViewById(R.id.modules_card_container);
@@ -95,7 +107,7 @@ public class ModulesFragment extends Fragment {
 
                 parentLayout.addView(cardView);
             } else {
-                modulesLogs.setText("banner: " + info.banner() + "\nisPatched: " + info.isPatched());
+                modulesLogs.setText("banner: " + info.banner() + "\nisPatched: false");
             }
         });
     }

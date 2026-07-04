@@ -49,7 +49,7 @@ public class MagicUtil {
         }
     }
 
-    public static void cleanWorkSpace(){
+    public static void cleanWorkSpace() {
         RootShellUtil.execCommand("rm -rf /data/adb/mirkforged/*");
     }
 
@@ -61,6 +61,9 @@ public class MagicUtil {
 
         Log.d("MagicUtil", "getPatchInformation: " + result.output);
         INIUtil.INIResult ini = INIUtil.parse(result.output);
+        if (ini.get("kernel", "banner") == null) {
+            return null;
+        }
         return new PatchInfo(result.output,
                 ini.get("kernel", "banner"),
                 ini.get("kernel", "patched").equals("true")
@@ -68,8 +71,8 @@ public class MagicUtil {
 
     }
 
-    public static String patchKernel(String[] additionArgs) {
-        RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && ./kptools-android --image kernel --patch -k kpimg -o kernel");
+    public static String patchKernel(String additionArgs) {
+        RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && ./kptools-android --image kernel --patch -k kpimg -o kernel" + additionArgs);
         return result.output + "\nError(if so, it will show here):\n" + result.error;
     }
 
@@ -77,7 +80,7 @@ public class MagicUtil {
      * 会将kernel写入到boot.img
      */
     public static String packBootImg() {
-        RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && ./kptools repack \"boot.img\"");
+        RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && ./kptools-android repack boot.img");
         return result.output + "\nError(if so, it will show here):\n" + result.error;
     }
 
@@ -85,7 +88,7 @@ public class MagicUtil {
      * 将/data/adb/mirkforged/boot.img写入到当前槽位
      */
     public static String installPatchedBoot() {
-        RootShellUtil.ShellResult result = RootShellUtil.execCommand("dd if=/data/adb/mirkforged/boot.img of="+getCurrBootSlotPath());
+        RootShellUtil.ShellResult result = RootShellUtil.execCommand("dd if=/data/adb/mirkforged/new-boot.img of=" + getCurrBootSlotPath());
         return "Please reboot";
     }
 

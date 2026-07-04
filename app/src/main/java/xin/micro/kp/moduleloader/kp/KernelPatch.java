@@ -1,6 +1,7 @@
 package xin.micro.kp.moduleloader.kp;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,9 +15,11 @@ import xin.micro.kp.moduleloader.util.MagicUtil;
 
 public class KernelPatch {
     private static final KernelPatch instance = new KernelPatch();
+
     KernelPatch() {
 
     }
+
     public static KernelPatch getInstance() {
         return instance;
     }
@@ -25,26 +28,35 @@ public class KernelPatch {
     // info
     // =============================================================================================
     private MagicUtil.PatchInfo info;
-    public boolean refreshStatusFull(Context context){
+
+    /**
+     * include doGetPatchInformation
+     * @return bool
+     */
+    public boolean refreshStatusFull(Context context) {
         //1.get boot
-        RootShellUtil.ShellResult result = RootShellUtil.execScriptFromAssets(context,"scripts/test.sh");
+        RootShellUtil.ShellResult result = RootShellUtil.execScriptFromAssets(context, "scripts/test.sh");
         //result.output
 
         //2.get info from kernel
         doGetPatchInformation();
         return true;
     }
-    public boolean doGetPatchInformation(){
+
+    public boolean doGetPatchInformation() {
         info = MagicUtil.getPatchInformation();
-        return true;
+        return isNormal();
     }
-    public MagicUtil.PatchInfo getPatchInformation(){
+
+    public MagicUtil.PatchInfo getPatchInformation() {
         return info;
     }
-    public boolean isPatched(){
+
+    public boolean isPatched() {
         return info.isPatched();
     }
-    public boolean isNormal(){
+
+    public boolean isNormal() {
         return (info != null);
     }
 
@@ -52,20 +64,22 @@ public class KernelPatch {
     // kpm
     // =============================================================================================
     private final List<KPMItem> moduleList = new ArrayList<>(); //将被加入修补的模块
-    public List<KPMItem> getModuleList(){
+
+    public List<KPMItem> getModuleList() {
         return moduleList;
     }
-    public int refreshKpmList(Context context){
+
+    public int refreshKpmList(Context context) {
         //files/kpm/xxx.kpm
         File kpmDir = new File(context.getFilesDir(), "kpm");
-
+        moduleList.clear();
         int count = 0;
         if (kpmDir.exists() && kpmDir.isDirectory()) {
             File[] files = kpmDir.listFiles();
 
             if (files != null) {
                 for (File file : files) {
-                    if(file.getName().endsWith(".kpm")){
+                    if (file.getName().endsWith(".kpm")) {
                         KPMItem kpmItem = new KPMItem(file.getAbsolutePath());
                         kpmItem.complete();
                         moduleList.add(kpmItem);
@@ -76,13 +90,14 @@ public class KernelPatch {
         }
         return count;
     }
-    public boolean preAddKpm(Context context, File kpm){
+
+    public boolean preAddKpm(Context context, File kpm) {
         File filesDir = context.getFilesDir();
         File kpmDir = new File(filesDir, "kpm");
-        if(!kpmDir.exists()){
+        if (!kpmDir.exists()) {
             kpmDir.mkdirs();
         }
-        if (!kpmDir.isDirectory()){
+        if (!kpmDir.isDirectory()) {
             kpmDir.delete();
             kpmDir.mkdirs();
         }
@@ -90,7 +105,7 @@ public class KernelPatch {
         {
             KPMItem kpmItem = new KPMItem(kpm.toPath().toString());
             kpmItem.complete();
-            name = kpmItem.name;
+            name = kpmItem.name + ".kpm";
         }
 
         File targetFile = new File(kpmDir, name);
@@ -105,6 +120,7 @@ public class KernelPatch {
             return false;
         }
     }
+
     public boolean removePreAddKpm(Context context, File kpm) {
         File filesDir = context.getFilesDir();
         File kpmDir = new File(filesDir, "kpm");
@@ -128,19 +144,25 @@ public class KernelPatch {
      *
      * @return output msg
      */
-    public String doPatchAndPackBootImg(){
+    public String doPatchAndPackBootImg() {
         StringBuilder msg = new StringBuilder();
-        msg.append(MagicUtil.patchKernel(null));
+        StringBuilder kpmArg = new StringBuilder();
+        for (KPMItem item : moduleList) {
+            kpmArg.append(" -M " + item.path + " -V pre-kernel-init -T kpm");
+        }
+        msg.append(MagicUtil.patchKernel(kpmArg.toString()));
         if (msg.toString().contains("patch done")) {
             msg.append("\nPatch Boot\n");
             msg.append(MagicUtil.packBootImg());
-        }//成功了才写boot.img
-        return msg.toString();
+            return msg.toString();
+        } else {//成功了才写boot.img
+            return msg.toString();
+        }
     }
 
     //将文件刷入到对应槽位
-    public String flashBootSlot(){
-        MagicUtil.installPatchedBoot()
+    public String flashBootSlot() {
+        MagicUtil.installPatchedBoot();
         return null;
     }
 }

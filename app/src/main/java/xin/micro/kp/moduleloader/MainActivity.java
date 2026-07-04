@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -16,8 +17,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import xin.micro.kp.moduleloader.root.RootShellUtil;
 import xin.micro.kp.moduleloader.ui.HomeFragment;
 import xin.micro.kp.moduleloader.ui.ModulesFragment;
+import xin.micro.kp.moduleloader.ui.MyFragment;
 import xin.micro.kp.moduleloader.ui.PatchFragment;
 import xin.micro.kp.moduleloader.kp.KernelPatch;
+import xin.micro.kp.moduleloader.util.ConfigUtils;
 import xin.micro.kp.moduleloader.util.MagicUtil;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,11 +28,28 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private ModulesFragment modulesFragment;
     private PatchFragment patchFragment;
-    private Fragment currentFragment;
+    private MyFragment currentFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        ConfigUtils.sp = getBaseContext().getSharedPreferences("my_config", MODE_PRIVATE);
+
+        // 获取 Root 权限
+        RootShellUtil.initRoot(getApplicationContext());
+        if (!RootShellUtil.isRootAvailable()){
+            new AlertDialog.Builder(getApplicationContext())
+                    .setTitle("Root权限获取失败")
+                    .setMessage("请检查Root权限是否开启 否则无法使用 :( ")
+                    .setNegativeButton("退出", (dialog, which) -> {
+                        finish();
+                    })
+                    .show();
+        }
+        MagicUtil.releaseFile(getApplicationContext());
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
@@ -63,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("home");
             modulesFragment = (ModulesFragment) getSupportFragmentManager().findFragmentByTag("modules");
             patchFragment = (PatchFragment) getSupportFragmentManager().findFragmentByTag("patch");
-            currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
+            currentFragment = (MyFragment) getSupportFragmentManager().findFragmentById(R.id.fragmentContainerView);
         }
 
         // 设置默认选中的菜单项
@@ -72,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         // 设置底部导航栏的点击监听
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
-            Fragment targetFragment = null;
+            MyFragment targetFragment = null;
 
             if (itemId == R.id.navigation_home) {
                 targetFragment = homeFragment;
@@ -93,13 +113,11 @@ public class MainActivity extends AppCompatActivity {
                         .show(targetFragment)
                         .commit();
                 currentFragment = targetFragment;
+                currentFragment.onShow();// 在这里调用onShow方法
                 return true;
             }
             return false;
         });
 
-        // 获取 Root 权限
-        RootShellUtil.initRoot(getApplicationContext());
-        MagicUtil.releaseFile(getApplicationContext());
     }
 }
