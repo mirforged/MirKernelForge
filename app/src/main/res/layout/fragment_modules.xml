@@ -36,10 +36,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="标题"
+                    android:text="InstantKernelAPI"
                     android:textSize="18sp"
                     android:textStyle="bold" />
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="如果内在修补时启用(添加)了mirkforged_user_api, 那么你将可以在此处使用(动态加卸载模块)等功能" />
                 <TextView
                     android:id="@+id/modules_logs"
                     android:layout_width="wrap_content"
@@ -57,13 +61,13 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:fillViewport="true"
-            android:scrollbars="vertical">
+            android:scrollbars="vertical"
+            android:overScrollMode="always">
             <!-- kpm列表-->
             <LinearLayout
                 android:id="@+id/modules_card_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:orientation="vertical"
                 android:paddingBottom="16dp">
 
@@ -77,16 +81,10 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btn_refresh_boot_full"
+                android:id="@+id/btn_refresh_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="拉取boot" />
-
-            <Button
-                android:id="@+id/btn_get_patch_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="获取patch状态" />
+                android:text="刷新状态" />
 
             <Button
                 android:id="@+id/btn_load_kpm"

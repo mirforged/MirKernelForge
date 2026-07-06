@@ -14,14 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
-import java.io.File;
-
 import xin.micro.kp.moduleloader.R;
 import xin.micro.kp.moduleloader.kp.KPMItem;
 import xin.micro.kp.moduleloader.kp.KernelPatch;
-import xin.micro.kp.moduleloader.utils.ConfigUtils;
 import xin.micro.kp.moduleloader.utils.FileUtil;
-import xin.micro.kp.moduleloader.utils.MagicUtil;
 import xin.micro.kp.moduleloader.utils.addition.InstantKernAPI;
 
 public class ModulesFragment extends MyFragment {
@@ -93,13 +89,7 @@ public class ModulesFragment extends MyFragment {
 
 
         modulesLogs = view.findViewById(R.id.modules_logs);
-        btnRefreshBootFull = view.findViewById(R.id.btn_refresh_boot_full);
-        btnRefreshBootFull.setOnClickListener(v -> {
-            if (KernelPatch.getInstance().refreshStatusFull(requireContext())) {
-                modulesLogs.setText("Successful");
-            }
-        });
-        btnGetPatchStatus = view.findViewById(R.id.btn_get_patch_status);
+        btnGetPatchStatus = view.findViewById(R.id.btn_refresh_status);
         btnGetPatchStatus.setOnClickListener(v -> {
             refreshStatus(view);
         });

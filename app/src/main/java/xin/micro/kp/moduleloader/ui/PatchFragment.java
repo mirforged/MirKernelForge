@@ -25,6 +25,7 @@ import xin.micro.kp.moduleloader.utils.ConfigUtils;
 import xin.micro.kp.moduleloader.utils.FileUtil;
 import xin.micro.kp.moduleloader.kp.KernelPatch;
 import xin.micro.kp.moduleloader.utils.MagicUtil;
+import xin.micro.kp.moduleloader.utils.addition.InstantKernAPI;
 
 public class PatchFragment extends MyFragment {
 
@@ -129,7 +130,17 @@ public class PatchFragment extends MyFragment {
                 adapter.setOnItemClickListener(position -> {
                     KPMItem item = adapter.getItem(position);
                     if (item != null) {
-                        Toast.makeText(getContext(), "点击了: " + item.name, Toast.LENGTH_SHORT).show();
+                        new AlertDialog.Builder(requireContext())
+                                .setTitle("移除模块：" + item.name)
+                                .setMessage("这个模块将被从(即将跟从修补)的模块列表中移除")
+                                .setPositiveButton("确定", (dialog, which) -> {
+                                    boolean success = KernelPatch.getInstance().removePreAddKpm(requireContext(), item.name+".kpm");
+                                    Toast.makeText(getContext(), success ? "移除成功" : "移除失败", Toast.LENGTH_SHORT).show();
+                                    refreshView();
+                                })
+                                .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
+                                .setCancelable(true)
+                                .show();
                     }
                 });
             } else {

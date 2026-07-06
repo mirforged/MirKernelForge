@@ -119,18 +119,30 @@ public class KernelPatch {
             return false;
         }
     }
+    public boolean removePreAddKpm(Context context, String kpmFileName) {
+        // 1. 空值检查
+        if (context == null || kpmFileName == null || kpmFileName.isEmpty()) {
+            return false;
+        }
 
-    public boolean removePreAddKpm(Context context, File kpm) {
-        File filesDir = context.getFilesDir();
-        File kpmDir = new File(filesDir, "kpm");
         try {
-            Files.copy(
-                    kpm.toPath(),
-                    kpmDir.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING
-            );
-            return true;
-        } catch (IOException e) {
+            File filesDir = context.getFilesDir();
+            File kpmDir = new File(filesDir, "kpm");
+            // 检查目录是否存在
+            if (!kpmDir.exists() || !kpmDir.isDirectory()) {
+                return false;
+            }
+
+            File targetFile = new File(kpmDir, kpmFileName);
+
+            // 检查文件是否存在且是文件（不是目录）
+            if (!targetFile.exists() || !targetFile.isFile()) {
+                return false;
+            }
+
+            return targetFile.delete();
+
+        } catch (SecurityException e) {
             return false;
         }
     }
