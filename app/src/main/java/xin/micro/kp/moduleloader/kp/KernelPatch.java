@@ -1,7 +1,6 @@
 package xin.micro.kp.moduleloader.kp;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xin.micro.kp.moduleloader.root.RootShellUtil;
-import xin.micro.kp.moduleloader.util.MagicUtil;
+import xin.micro.kp.moduleloader.utils.MagicUtil;
 
 public class KernelPatch {
     private static final KernelPatch instance = new KernelPatch();

@@ -1,4 +1,4 @@
-package xin.micro.kp.moduleloader.util;
+package xin.micro.kp.moduleloader.utils;
 
 import java.util.*;
 import java.util.regex.Pattern;

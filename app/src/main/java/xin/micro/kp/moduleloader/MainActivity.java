@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -20,8 +19,8 @@ import xin.micro.kp.moduleloader.ui.ModulesFragment;
 import xin.micro.kp.moduleloader.ui.MyFragment;
 import xin.micro.kp.moduleloader.ui.PatchFragment;
 import xin.micro.kp.moduleloader.kp.KernelPatch;
-import xin.micro.kp.moduleloader.util.ConfigUtils;
-import xin.micro.kp.moduleloader.util.MagicUtil;
+import xin.micro.kp.moduleloader.utils.ConfigUtils;
+import xin.micro.kp.moduleloader.utils.MagicUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         // 获取 Root 权限
         RootShellUtil.initRoot(getApplicationContext());
         if (!RootShellUtil.isRootAvailable()){
-            new AlertDialog.Builder(getApplicationContext())
+            new AlertDialog.Builder(this)
                     .setTitle("Root权限获取失败")
                     .setMessage("请检查Root权限是否开启 否则无法使用 :( ")
                     .setNegativeButton("退出", (dialog, which) -> {
@@ -50,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
         }
         MagicUtil.releaseFile(getApplicationContext());
 
+
+        //================UILoader===================
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
@@ -113,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                         .show(targetFragment)
                         .commit();
                 currentFragment = targetFragment;
-                currentFragment.onShow();// 在这里调用onShow方法
+                currentFragment.onShow(currentFragment.getView());// 在这里调用onShow方法
                 return true;
             }
             return false;

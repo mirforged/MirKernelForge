@@ -4,6 +4,8 @@
       <w>kptools</w>
       <w>libsu</w>
       <w>mirkforged</w>
+      <w>moduleloader</w>
+      <w>usercall</w>
     </words>
   </dictionary>
 </component>

@@ -1,4 +1,4 @@
-package xin.micro.kp.moduleloader.util;
+package xin.micro.kp.moduleloader.utils;
 
 import android.content.Context;
 import android.util.Log;
@@ -39,6 +39,12 @@ public class MagicUtil {
             destFile = new File(filesDir, "kptools-android");
             RootShellUtil.execCommand("cp -u " + destFile.getAbsolutePath() + " /data/adb/mirkforged/");
             RootShellUtil.execCommand("chmod +x /data/adb/mirkforged/kptools-android");
+
+            //instant_kern_api usercall
+            AssetsUtil.releaseAsset(context, "usercall");
+            destFile = new File(filesDir, "usercall");
+            RootShellUtil.execCommand("cp -u " + destFile.getAbsolutePath() + " /data/adb/mirkforged/");
+            RootShellUtil.execCommand("chmod +x /data/adb/mirkforged/usercall");
 
             //kpimg
             AssetsUtil.releaseAsset(context, "kpimg");

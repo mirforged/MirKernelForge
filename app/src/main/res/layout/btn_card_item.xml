@@ -23,7 +23,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tv_card_title"
+                android:id="@+id/card_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="标题"
@@ -32,15 +32,13 @@
                 android:textColor="#333333" />
 
             <TextView
-                android:id="@+id/tv_card_description"
+                android:id="@+id/card_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="描述信息"
                 android:textSize="14sp"
-                android:textColor="#666666"
-                android:maxLines="2"
-                android:ellipsize="end" />
+                android:textColor="#666666" />
 
         </LinearLayout>
 

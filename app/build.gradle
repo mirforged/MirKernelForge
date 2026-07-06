@@ -14,6 +14,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
+        externalNativeBuild {
+            cmake {
+                cppFlags ''
+            }
+        }
     }
 
     buildTypes {
@@ -28,11 +34,16 @@ android {
         targetCompatibility JavaVersion.VERSION_21
     }
 
-    // 如果使用 View 系统，可以移除 compose 支持
-    // 如果仍需要使用 Compose 的 Java 互操作，保留以下配置
     buildFeatures {
-        // compose true  // 纯 Java + View 系统时注释掉
-        // viewBinding true  // 可选：启用 ViewBinding
+        // compose true
+        // viewBinding true
+    }
+
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.22.1'
+        }
     }
 }
 
@@ -51,9 +62,5 @@ dependencies {
     implementation "com.github.topjohnwu.libsu:service:6.0.0"
     implementation libs.androidx.cardview
 
-
-    // 测试依赖
-    // testImplementation 'junit:junit:4.13.2'
-    // androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    // androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    implementation 'com.google.code.gson:gson:2.14.0'
 }

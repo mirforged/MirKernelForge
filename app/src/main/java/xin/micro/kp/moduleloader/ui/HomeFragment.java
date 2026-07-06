@@ -129,8 +129,9 @@ public class HomeFragment extends MyFragment {
 
         //这是我写过第二烂的代码
         StringBuilder builder = new StringBuilder();
-        builder.append("附加信息");
-        RootShellUtil.ShellResult result = RootShellUtil.execCommand("id --context");
+        builder.append("\n[其他]");
+        RootShellUtil.ShellResult result;
+        result = RootShellUtil.execCommand("id -Z");
         builder.append("\nContext: ");
         builder.append(result.output);
         result = RootShellUtil.execCommand("uname -m");
