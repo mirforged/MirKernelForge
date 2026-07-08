@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import xin.micro.kp.moduleloader.root.RootShellUtil;
+import xin.micro.kp.moduleloader.utils.ConfigUtils;
 import xin.micro.kp.moduleloader.utils.MagicUtil;
 
 public class KernelPatch {
@@ -39,6 +40,7 @@ public class KernelPatch {
 
         //2.get info from kernel
         doGetPatchInformation();
+        ConfigUtils.sp.edit().putString("recorded_boot_sha256", MagicUtil.getCurrBootSha256()).apply();
         return true;
     }
 
@@ -132,6 +134,8 @@ public class KernelPatch {
             if (!kpmDir.exists() || !kpmDir.isDirectory()) {
                 return false;
             }
+
+
 
             File targetFile = new File(kpmDir, kpmFileName);
 

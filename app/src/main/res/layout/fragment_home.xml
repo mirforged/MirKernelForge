@@ -14,12 +14,12 @@
 
         <!-- Root状态卡片 -->
         <androidx.cardview.widget.CardView
+            style="@style/CardViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            style="@style/CardViewStyle">
+            app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -57,12 +57,12 @@
         <!-- 系统信息卡片 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/system_info_card"
+            style="@style/CardViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            style="@style/CardViewStyle">
+            app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -179,14 +179,14 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
+
                     <TextView
                         android:id="@+id/additional_information"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="附加信息"
                         android:textColor="?attr/colorPrimaryText"
-                        android:textSize="16sp"
-                        />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -194,11 +194,11 @@
 
         <!-- 操作按钮卡片 -->
         <androidx.cardview.widget.CardView
+            style="@style/CardViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
-            app:cardElevation="2dp"
-            style="@style/CardViewStyle">
+            app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -222,6 +222,7 @@
 
                     <Button
                         android:id="@+id/btn_refresh"
+                        style="@style/ButtonStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
@@ -230,11 +231,40 @@
                         android:padding="10dp"
                         android:text="刷新"
                         android:textColor="?attr/colorOnSecondary"
-                        android:textSize="14sp"
-                        style="@style/ButtonStyle" />
+                        android:textSize="14sp" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
+        <androidx.cardview.widget.CardView
+            style="@style/CardViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="教程(必看)"
+                android:textColor="?attr/colorPrimaryText"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1.先前往Patch界面 刷新状态\n2.点击添加模块 选择你要嵌入的kpm模块\n3.点击开始修补，没有错误的话会[显示日志并询问是否刷入]\n4.点击刷入、手动重启手机不出意外的话kpm已经在工作了\nEX.高级用法：你可以勾选[InstantKernAPI]这会往模块列表加入一个模块、让你可以免重启加载、卸载、控制kpm"
+                android:textColor="?attr/colorPrimaryText"
+                android:textSize="16sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 </ScrollView>

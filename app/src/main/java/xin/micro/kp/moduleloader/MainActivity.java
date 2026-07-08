@@ -41,11 +41,12 @@ public class MainActivity extends AppCompatActivity {
         if (!RootShellUtil.isRootAvailable()){
             new AlertDialog.Builder(this)
                     .setTitle("Root权限获取失败")
-                    .setMessage("请检查Root权限是否开启 否则无法使用 :( ")
+                    .setMessage("请检查Root权限是否开启 否则无法使用")
                     .setNegativeButton("退出", (dialog, which) -> {
                         finish();
                     })
                     .show();
+            return;
         }
         MagicUtil.releaseFile(getApplicationContext());
 
@@ -98,12 +99,17 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == R.id.navigation_home) {
                 targetFragment = homeFragment;
             } else if (itemId == R.id.navigation_modules) {
+                if (ConfigUtils.sp.getString("already_instant_api_warning", "false").equals("false")){
+                    ConfigUtils.sp.edit().putString("already_instant_api_warning", "true").apply();
+                    new AlertDialog.Builder(this)
+                            .setTitle("警告（仅显示一次）")
+                            .setMessage("⚠️请确认你已经 修补（启用了Instant KernAPI）、刷入、重启，否则切换到Modules界面时将会闪退")
+                            .setNegativeButton("了解", (dialog, which) -> {})
+                            .setOnDismissListener(dialog -> {})
+                            .show();
+                }
                 targetFragment = modulesFragment;
             }else if (itemId == R.id.navigation_patch) {
-                if (!KernelPatch.getInstance().isNormal()){
-                    Toast.makeText(getApplicationContext(), "请先拉取内核状态", Toast.LENGTH_SHORT).show();
-                    return false;
-                }
                 targetFragment = patchFragment;
             }
 

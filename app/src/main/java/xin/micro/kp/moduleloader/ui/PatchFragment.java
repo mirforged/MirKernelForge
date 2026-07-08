@@ -154,11 +154,15 @@ public class PatchFragment extends MyFragment {
 
         KernelPatch.getInstance().doGetPatchInformation();
         MagicUtil.PatchInfo info = KernelPatch.getInstance().getPatchInformation();
-        tvInfoDescription.setText(
-                "将跟随修补的kpm数量: " + preAddKpmCount +
-                        "\nbanner: " + info.banner() +
-                        "\nisPatched: " + info.isPatched() +
-                        "\nrecorded_boot_sha256: " + ConfigUtils.sp.getString("recorded_boot_sha256", "NULL"));
+        if (info!=null){
+            tvInfoDescription.setText(
+                    "将跟随修补的kpm数量: " + preAddKpmCount +
+                            "\nbanner: " + info.banner() +
+                            "\nisPatched: " + info.isPatched() +
+                            "\nrecorded_boot_sha256: " + ConfigUtils.sp.getString("recorded_boot_sha256", "NULL"));
+        }else{
+            tvInfoDescription.setText("错误: 无法获取信息");
+        }
     }
 
     private void setupListeners() {
