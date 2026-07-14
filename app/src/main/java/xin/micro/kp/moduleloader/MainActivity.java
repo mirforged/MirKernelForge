@@ -107,8 +107,10 @@ public class MainActivity extends AppCompatActivity {
                             .setNegativeButton("了解", (dialog, which) -> {})
                             .setOnDismissListener(dialog -> {})
                             .show();
+                    return false;
+                }else{
+                    targetFragment = modulesFragment;
                 }
-                targetFragment = modulesFragment;
             }else if (itemId == R.id.navigation_patch) {
                 targetFragment = patchFragment;
             }
