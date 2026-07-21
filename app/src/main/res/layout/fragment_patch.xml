@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -15,9 +16,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
+            app:cardBackgroundColor="#E3F2FD"
             app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="#E3F2FD">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -30,19 +31,19 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="信息显示"
+                    android:textColor="#1976D2"
                     android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#1976D2" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tv_info_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:visibility="gone"
                     android:text="系统信息显示区域"
+                    android:textColor="#555555"
                     android:textSize="14sp"
-                    android:textColor="#555555" />
+                    android:visibility="gone" />
 
                 <View
                     android:layout_width="match_parent"
@@ -50,15 +51,30 @@
                     android:layout_marginTop="12dp"
                     android:background="#BBDEFB" />
 
-                <TextView
-                    android:id="@+id/tv_info_status"
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="状态: 正常"
-                    android:textSize="12sp"
-                    android:textColor="#4CAF50" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="8dp">
 
+                    <TextView
+                        android:id="@+id/tv_info_status"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="状态: 正常"
+                        android:textSize="12sp" />
+
+                    <Switch
+                        android:id="@+id/switch_enable_instant_kern_api"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Instant Kern API"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                </LinearLayout>
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -76,35 +92,34 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="8dp">
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btn_refresh_status"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="刷新状态"
-                android:backgroundTint="#5ACCCC" />
+                android:layout_weight="1"
+                android:backgroundTint="#5ACCCC"
+                android:text="刷新状态" />
 
             <Button
                 android:id="@+id/btn_add_module"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginEnd="8dp"
-                android:text="添加模块"
-                android:backgroundTint="#4CAF50" />
+                android:layout_weight="1"
+                android:backgroundTint="#4CAF50"
+                android:text="添加模块" />
 
             <Button
                 android:id="@+id/btn_start_repair"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="开始修补"
-                android:backgroundTint="#2196F3" />
+                android:backgroundTint="#2196F3"
+                android:text="开始修补" />
 
         </LinearLayout>
 

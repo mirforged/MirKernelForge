@@ -56,4 +56,34 @@ public class InstantKernAPI {
         RootShellUtil.ShellResult result = RootShellUtil.execCommand("cd /data/adb/mirkforged/ && ./usercall -f -U " + name);
         return 0;
     }
+    public static String controlKPM(String name, String args) {
+        // 执行命令
+        RootShellUtil.ShellResult result = RootShellUtil.execCommand(
+                "cd /data/adb/mirkforged/ && ./usercall -f -c " + name + " \"" + args + "\""
+        );
+
+        // 解析 JSON 响应
+        try {
+            Gson gson = new Gson();
+            JsonObject jsonResponse = gson.fromJson(result.output, JsonObject.class);
+
+            // 获取状态
+            String status = jsonResponse.get("status").getAsString();
+
+            if ("success".equals(status)) {
+                // 成功时返回输出信息
+
+                return jsonResponse.has("output") ?
+                        jsonResponse.get("output").getAsString() : "";
+            } else {
+                // 失败时返回错误信息
+                String errorMsg = jsonResponse.has("message") ?
+                        jsonResponse.get("message").getAsString() : "Unknown error";
+                return "Failed: " + errorMsg;
+            }
+        } catch (Exception e) {
+            // JSON 解析失败时返回原始输出或错误信息
+            return "Error parsing response: " + e.getMessage() + "\nRaw output: " + result.output;
+        }
+    }
 }
