@@ -23,25 +23,26 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         
-      - name: Decode keystore and set environment variables
+      - name: Decode keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          # 解码证书到 app 目录
-          echo "$KEYSTORE_BASE64" | base64 --decode > app/keystore.jks
-          # 设置环境变量供 Gradle 使用
-          echo "KEYSTORE_PATH=app/keystore.jks" >> $GITHUB_ENV
+          # 在项目根目录解码证书
+          echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
+          echo "KEYSTORE_PATH=$PWD/keystore.jks" >> $GITHUB_ENV
           echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> $GITHUB_ENV
           echo "KEY_ALIAS=$KEY_ALIAS" >> $GITHUB_ENV
           echo "KEY_PASSWORD=$KEY_PASSWORD" >> $GITHUB_ENV
-          # 验证证书文件是否存在
-          ls -la app/keystore.jks
+          # 调试信息
+          echo "Certificate file:"
+          ls -la keystore.jks
+          echo "Current directory: $PWD"
         
       - name: Build release APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --stacktrace
         
       - name: Upload signed APK
         uses: actions/upload-artifact@v4
