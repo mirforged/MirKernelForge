@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整历史以计算 commit 总数
         
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -30,13 +32,11 @@ jobs:
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          # 在项目根目录解码证书
           echo "$KEYSTORE_BASE64" | base64 --decode > keystore.jks
           echo "KEYSTORE_PATH=$PWD/keystore.jks" >> $GITHUB_ENV
           echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> $GITHUB_ENV
           echo "KEY_ALIAS=$KEY_ALIAS" >> $GITHUB_ENV
           echo "KEY_PASSWORD=$KEY_PASSWORD" >> $GITHUB_ENV
-          # 调试信息
           echo "Certificate file:"
           ls -la keystore.jks
           echo "Current directory: $PWD"
@@ -44,8 +44,43 @@ jobs:
       - name: Build release APK
         run: ./gradlew assembleRelease --stacktrace
         
+      - name: Get commit count and rename APK
+        id: rename_apk
+        run: |
+          # 获取 commit 总数
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          echo "Commit count: $COMMIT_COUNT"
+          
+          # 查找 APK 文件（可能有多个变体）
+          APK_DIR="app/build/outputs/apk/release"
+          APK_FILE=$(find "$APK_DIR" -name "*.apk" | head -n 1)
+          
+          if [ -z "$APK_FILE" ]; then
+            echo "No APK file found!"
+            exit 1
+          fi
+          
+          echo "Found APK: $APK_FILE"
+          
+          # 提取文件名和扩展名
+          APK_DIRNAME=$(dirname "$APK_FILE")
+          APK_BASENAME=$(basename "$APK_FILE" .apk)
+          
+          # 构建新文件名（在 .apk 前添加 commit 数量）
+          NEW_APK_NAME="${APK_BASENAME}-${COMMIT_COUNT}.apk"
+          NEW_APK_PATH="${APK_DIRNAME}/${NEW_APK_NAME}"
+          
+          # 重命名文件
+          mv "$APK_FILE" "$NEW_APK_PATH"
+          echo "Renamed to: $NEW_APK_PATH"
+          
+          # 设置输出变量供后续步骤使用
+          echo "new_apk_name=$NEW_APK_NAME" >> $GITHUB_OUTPUT
+          echo "new_apk_path=$NEW_APK_PATH" >> $GITHUB_OUTPUT
+          echo "commit_count=$COMMIT_COUNT" >> $GITHUB_OUTPUT
+        
       - name: Upload signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-signed
+          name: app-release-signed-${{ steps.rename_apk.outputs.commit_count }}
           path: app/build/outputs/apk/release/*.apk
