@@ -111,6 +111,7 @@ public class KernelPatch {
 
         File targetFile = new File(kpmDir, name);
         try {
+            //如果已有文件 会覆盖
             Files.copy(
                     kpm.toPath(),
                     targetFile.toPath(),

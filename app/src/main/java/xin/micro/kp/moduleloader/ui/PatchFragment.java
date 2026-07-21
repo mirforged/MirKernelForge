@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,11 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import xin.micro.kp.moduleloader.R;
 import xin.micro.kp.moduleloader.kp.KPMItem;
+import xin.micro.kp.moduleloader.utils.AssetsUtil;
 import xin.micro.kp.moduleloader.utils.ConfigUtils;
 import xin.micro.kp.moduleloader.utils.FileUtil;
 import xin.micro.kp.moduleloader.kp.KernelPatch;
@@ -38,6 +41,7 @@ public class PatchFragment extends MyFragment {
     private TextView tvInfoStatus;
     private ModuleAdapter adapter;
     private FileUtil fileUtil;
+    private Switch switchEnableIKA;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -97,6 +101,7 @@ public class PatchFragment extends MyFragment {
         tvInfoTitle = view.findViewById(R.id.tv_info_title);
         tvInfoDescription = view.findViewById(R.id.tv_info_description);
         tvInfoStatus = view.findViewById(R.id.tv_info_status);
+        switchEnableIKA = view.findViewById(R.id.switch_enable_instant_kern_api);
     }
 
     @SuppressLint("SetTextI18n")
@@ -216,6 +221,21 @@ public class PatchFragment extends MyFragment {
                 Toast.makeText(requireContext(),"匹配,无需拉取",Toast.LENGTH_SHORT).show();
             }
             refreshView();
+        });
+        switchEnableIKA.setOnClickListener(v->{
+            try {
+                if (switchEnableIKA.isChecked()) {
+                    AssetsUtil.releaseAsset(requireContext(), "instant_kern_api.kpm");
+                    File filesDir = requireContext().getFilesDir();
+                    File kpm = new File(filesDir, "instant_kern_api.kpm");
+                    KernelPatch.getInstance().preAddKpm(requireContext(), kpm);
+                }else{
+                    KernelPatch.getInstance().removePreAddKpm(requireContext(), "mirkforged_user_api.kpm");
+                }
+                refreshView();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
